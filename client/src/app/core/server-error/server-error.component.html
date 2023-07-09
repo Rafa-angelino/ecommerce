@@ -1,0 +1,15 @@
+<div class="container mt-5">
+  <h4>Erro de servidor interno - realize o recarregamento da página.</h4>
+  <ng-container *ngIf="error">
+      <h5 class="text-danger">Erro encontrado : {{error.message}}</h5>
+      <p class="font-weight-bold">O erro foi gerado no servidor, não nos componentes da página</p>
+      <p>O que fazer agora?</p>
+      <ol>
+        <li>Recarregue a página</li>
+        <li>Realize a limpeza dos cookies</li>
+        <li>Contate o suporte técnico através do número 19 994392332 informando o erro informado abaixo para verificarmos o caso</li>
+      </ol>
+      <h5>Stack Trace</h5>
+      <code class="mt-5" style="background-color: rgb(245,245,245);">{{error.details}}</code>
+  </ng-container>
+</div>
