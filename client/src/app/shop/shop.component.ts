@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Product } from '../shared/models/product';
 import { ShopService } from './shop.service';
 import { Brand } from '../shared/models/brand';
 import { Type } from '../shared/models/type';
+import { ShopParams } from '../shared/models/shoppingParams';
 
 @Component({
   selector: 'app-shop',
@@ -10,18 +11,18 @@ import { Type } from '../shared/models/type';
   styleUrls: ['./shop.component.scss']
 })
 export class ShopComponent implements OnInit {
+  @ViewChild('search') searchTerm?: ElementRef
   products: Product[] = [];
   brands: Brand[] = [];
   types: Type[] = []
-  brandIdSelected = 0;
-  typeIdSelected = 0;
-  sortSelected ='name';
+  shopParam = new ShopParams()
   sortOptions= [
     {name: 'Ordem alfabética', value: 'name'},
     {name: 'Preço: Do menor ao Maior', value: 'priceAsc'},
-    {name: 'Preço: Do maior para o menor', value: 'priceDesc'}
-  ]
+    {name: 'Preço: Do maior para o menor', value: 'priceDesc'},
 
+  ];
+  totalCount = 0;
 
   constructor(private service: ShopService) {}
 
@@ -32,8 +33,13 @@ export class ShopComponent implements OnInit {
   }
 
   getProducts() {
-    this.service.getProducts(this.brandIdSelected, this.typeIdSelected, this.sortSelected).subscribe({
-      next: (response) =>  this.products = response.data,
+    this.service.getProducts(this.shopParam).subscribe({
+      next: (response) => {
+        this.products = response.data;
+        this.shopParam.pageNumber = response.pageIndex;
+        this.shopParam.pageSize = response.pageSize;
+        this.totalCount = response.count;
+      },
       error: error => console.log(error)
     })
   }
@@ -53,17 +59,37 @@ export class ShopComponent implements OnInit {
   }
 
   onBrandSelected(brandId: number) {
-    this.brandIdSelected = brandId;
+    this.shopParam.brandId = brandId;
+    this.shopParam.pageNumber = 1; // fix : sempre quando trocar o filtro ele iniciar na pageNumber(pageIndex) igual a 1
     this.getProducts()
   }
 
   onTypeSelected(typeId: number) {
-    this.typeIdSelected = typeId;
+    this.shopParam.typeId = typeId;
+    this.shopParam.pageNumber = 1; // fix : sempre quando trocar o filtro ele iniciar na pageNumber(pageIndex) igual a 1
     this.getProducts();
   }
 
   onSortSelected(event: any) {
-    this.sortSelected = event.target.value;
+    this.shopParam.sort = event.target.value;
+    this.getProducts();
+  }
+
+  onPageChange(event: any) {
+    if(this.shopParam.pageNumber !== event) {
+      this.shopParam.pageNumber = event;
+      this.getProducts();
+    }
+  }
+
+  onSearch() {
+    this.shopParam.search = this.searchTerm?.nativeElement.value;
+    this.getProducts();
+  }
+
+  onReset() {
+    if(this.searchTerm) this.searchTerm.nativeElement.value = '';
+    this.shopParam = new ShopParams();
     this.getProducts();
   }
 

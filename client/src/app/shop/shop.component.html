@@ -11,7 +11,7 @@
       <ul class="list-group my-3">
         <li class="list-group-item"
         *ngFor="let brand of brands"
-        [class.active]="brand.id === brandIdSelected"
+        [class.active]="brand.id === shopParam.brandId"
         [value]="brand.id"
         (click)="onBrandSelected(brand.id)">
         {{brand.name}}
@@ -22,7 +22,7 @@
       <ul class="list-group my-3">
         <li class="list-group-item"
         *ngFor="let type of types"
-        [class.active]="type.id == typeIdSelected"
+        [class.active]="type.id == shopParam.typeId"
         [value]="type.id"
         (click)="onTypeSelected(type.id)"
         >{{type.name}}</li>
@@ -30,20 +30,32 @@
     </section>
     <section class="col-9">
       <div class="d-flex justify-content-between align-items-center pd-2">
-        <header>
-          <span>Mostrando <strong>10</strong> de <strong>18</strong> resultados</span>
-        </header>
+        <app-paging-header
+          [pageNumber]="shopParam.pageNumber"
+          [pageSize] = "shopParam.pageSize"
+          [totalCount]="totalCount">
+        </app-paging-header>
         <div class="d-flex mt-2 mb-3">
-          <input type="text" placeholder="Pesquisar" class="form-control me-2">
-          <button class="btn btn-outline-primary mx-2">Pesquisar</button>
-          <button class="btn btn-outline-success">Resetar</button>
+          <input (keyup.enter)="onSearch()" type="text" placeholder="Pesquisar" class="form-control me-2" #search>
+          <button class="btn btn-outline-primary mx-2" (click)="onSearch()">Pesquisar</button>
+          <button class="btn btn-outline-success" (click)="onReset()">Resetar</button>
         </div>
       </div>
 
-      <div class="row row-cols-3 g-3">
+      <div class="row row-cols-3 g-3" *ngIf="products.length > 0; else mensagem">
         <div class="col" *ngFor="let product of products">
           <app-product-item [product]="product"></app-product-item> <!--passa a informação que de product que está em aspas para product com component que tem marcado o decorator @Input com esse mesmo nome-->
         </div>
+
+      </div>
+      <ng-template #mensagem><h3 style="color:red;">Nenhum produto encontrado para esse determinado filtro. Tente novamente com outro filtro ou reinicie a página</h3></ng-template>
+
+      <div class="d-flex justify-content-center mt-3 mb-2" *ngIf="totalCount > 0">
+        <app-pager
+          [totalCount]="totalCount"
+          [pageSize]="shopParam.pageSize"
+          (pageChanged)="onPageChange($event)"> <!--recebe o evento do componente filho-->
+        </app-pager>
       </div>
     </section>
   </div>
