@@ -56,9 +56,9 @@ export class ProductDetailsComponent implements OnInit {
 
   updateBasket(){
     if(this.product){
-      if(this.quantity > this.quantityInBasket){
-        const itemsToAdd = this.quantity - this.quantityInBasket;
-        this.quantityInBasket += itemsToAdd;
+      if(this.quantity > this.quantityInBasket){ //caso inserir uma quantidade do item maior da que está no carrinho
+        const itemsToAdd = this.quantity - this.quantityInBasket; //descobrir a quantidade de itens para adicionar
+        this.quantityInBasket += itemsToAdd; //aumenta a quantidade de itens no carrinho
         this.basketService.addItemToBasket(this.product,itemsToAdd)
       } else {
         const itemsToRemove = this.quantityInBasket - this.quantity;
